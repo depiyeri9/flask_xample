@@ -52,3 +52,45 @@ def add_row():
         return redirect(url_for("index"))
 
     return render_template("add.html")
+
+
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit_row(id):
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    if request.method == "POST":
+        nama_user = request.form["nama_user"]
+        nama_kegiatan = request.form["nama_kegiatan"]
+        durasi = request.form["durasi"]
+        tanggal_input = request.form["tanggal_input"]
+
+        cur.execute("""
+            UPDATE log_book
+            SET nama_user=%s, nama_kegiatan=%s, durasi=%s, tanggal_input=%s
+            WHERE id=%s
+        """, (nama_user, nama_kegiatan, durasi, tanggal_input, id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Data berhasil diupdate!", "success")
+        return redirect(url_for("index"))
+
+    # ambil data lama buat isi form edit
+    cur.execute("SELECT * FROM log_book WHERE id = %s", (id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return render_template("edit.html", row=row)
+
+
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete_row(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM log_book WHERE id=%s", (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    flash("Data berhasil dihapus!", "danger")
+    return redirect(url_for("index"))
