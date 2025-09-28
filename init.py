@@ -19,15 +19,29 @@ def get_db_connection():
         database='azam_prokom_04_09_25'
     )
 
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 def index():
+    search_query = request.args.get("q", "").strip()  # get ?q= from URL
     conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM log_book")
-    rows = cur.fetchall()
-    cur.close()
+    cursor = conn.cursor()
+
+    if search_query:
+        cursor.execute("""
+            SELECT id, nama_user, nama_kegiatan, durasi, tanggal_input 
+            FROM log_book
+            WHERE nama_user LIKE %s OR nama_kegiatan LIKE %s
+            ORDER BY tanggal_input DESC
+        """, (f"%{search_query}%", f"%{search_query}%"))
+    else:
+        cursor.execute("""
+            SELECT id, nama_user, nama_kegiatan, durasi, tanggal_input 
+            FROM log_book
+            ORDER BY tanggal_input DESC
+        """)
+
+    rows = cursor.fetchall()
     conn.close()
-    return render_template("read.html", rows=rows)
+    return render_template("read.html", rows=rows, search_query=search_query)
 
 
 @app.route("/add", methods=["GET", "POST"])
