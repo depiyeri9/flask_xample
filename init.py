@@ -8,15 +8,39 @@ bootstrap = Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
 import os
+# optional: load environment variables from a .env file if python-dotenv is installed
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    # python-dotenv not installed or failed to load; environment variables may still be set by the shell
+    pass
+
 app.secret_key = os.urandom(24)
 
 
 def get_db_connection():
+    """Create a MySQL connection using environment variables with sensible defaults.
+
+    Environment variables (zsh examples):
+      export DB_HOST=localhost
+      export DB_USER=root
+      export DB_PASSWORD=yourpassword
+      export DB_NAME=your_database_name
+
+    If the variables are not set, defaults are used (host=localhost, user=root,
+    password=, database=db_task) to make local testing easier.
+    """
+    host = os.getenv("DB_HOST", "localhost")
+    user = os.getenv("DB_USER", "root")
+    password = os.getenv("DB_PASSWORD", "")
+    database = os.getenv("DB_NAME", "db_task")
+
     return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='your_db_password',
-        database='your_db_name'
+        host=host,
+        user=user,
+        password=password,
+        database=database,
     )
 
 @app.route("/", methods=["GET", "POST"])
