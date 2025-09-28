@@ -8,150 +8,111 @@ If you are new to programming or new to this project, follow the steps exactly a
 ## Quick overview (what this project contains)
 
 - `init.py` — the Flask application entry point.
-- `requirements.txt` — Python packages required by the app.
-- `log_book_202509281932.sql` — SQL dump to create the project's database and `log_book` table.
-- `templates/` — HTML templates used by the web pages (`index.html`, `add.html`, `edit.html`).
+# Simple README — for absolute beginners
 
-## What you need (prerequisites)
+This project is a tiny Flask app that stores a "log book" in MySQL. If you are new to programming, follow these exact steps. Copy-paste the commands into your terminal.
 
-- Python 3.8+ installed (3.11 recommended). Check with `python3 --version`.
-- MySQL server installed and running (or MariaDB). You need a user with privileges to create a database and import the SQL file.
-- A terminal using zsh (this README uses zsh commands).
+If something does not work, copy the error message and share it and I will help.
 
-If you're not sure how to install Python or MySQL, search for "install Python on macOS" and "install MySQL on macOS" — there are many tutorials.
+## What is here
 
-## Step-by-step setup (for dummies)
+- `init.py` — the app code (reads database settings from environment variables).
+- `requirements.txt` — packages to install.
+- `log_book_202509281932.sql` — database structure and sample data.
+- `templates/` — HTML pages used by the app.
 
-1. Open Terminal (zsh).
+## Step 0 — open terminal and go to the project
 
-2. Clone or open this project folder (you already have it opened):
-
-```zsh
-# Flask — README (beginner friendly)
-
-This is a very small Flask app that stores a simple "log book" in a MySQL database. This README explains, in plain language, how to get the app working on macOS (zsh). The configuration is dynamic — you do not need to edit Python files to set your database credentials.
-
-## Quick overview (what this project contains)
-
-- `init.py` — the Flask application entry point (reads DB config from environment variables).
-- `requirements.txt` — Python packages required by the app.
-- `log_book_202509281932.sql` — SQL dump to create the project's database and `log_book` table.
-- `templates/` — HTML templates used by the web pages (`index.html`, `add.html`, `edit.html`).
-
-## What you need (prerequisites)
-
-- Python 3.8+ installed (3.11 recommended). Check with `python3 --version`.
-- MySQL server installed and running (or MariaDB). You need a user with privileges to create a database and import the SQL file.
-- A terminal using zsh (this README uses zsh commands).
-
-## Step-by-step setup (for dummies)
-
-1) Open Terminal (zsh)
-
-2) Change to the project folder in your terminal:
+Open Terminal (zsh). Then change to the project folder (replace the path):
 
 ```zsh
-# example: update the path to where you have the project
 cd /path/to/this/project
 ```
 
-3) Create and activate a Python virtual environment (recommended):
+Examples below assume you run commands from the project folder.
+
+## Step 1 — create a virtual environment and install packages
 
 ```zsh
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-4) Install the required Python packages:
-
-```zsh
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-5) Create the MySQL database and import the table structure/data using the provided SQL file
+If any command fails, copy the error and paste it here.
 
-- Start your MySQL server (if it isn't running).
-- Pick a name for the database and import the SQL dump. Replace DB_NAME with your chosen name:
+## Step 2 — create the database and import the data (copy-paste)
+
+Pick a name for your database. We will use `my_logbook` as an example.
 
 ```zsh
-DB_NAME=azam_prokom_local
+DB_NAME=my_logbook
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 mysql -u root -p $DB_NAME < log_book_202509281932.sql
 ```
 
-You will be prompted for the MySQL password when using `-p`.
+- You will be asked for your MySQL password after `-p`.
+- If you do not use `root`, replace `-u root` with `-u your_mysql_user`.
 
-If you use a different MySQL user than `root`, pass `-u youruser` and provide that user's password when prompted, or use environment variables as described below.
+If you see "Access denied", use a MySQL user with the right privileges or ask someone who manages the database for help.
 
-6) Configure database credentials (recommended: environment variables)
+## Step 3 — tell the app how to connect to the database (two easy ways)
 
-The app reads DB credentials from environment variables. This is safer and more portable than editing code.
+Option A — quick (temporary) using shell variables
 
-Environment variables used by the app (defaults shown):
-
-- `DB_HOST` (default: `localhost`)
-- `DB_USER` (default: `root`)
-- `DB_PASSWORD` (default: `rootr00t`)
-- `DB_NAME` (default: `azam_prokom_04_09_25`)
-
-Set them in zsh like this:
+Run these commands in the same terminal window where you will start the app. Replace values with your MySQL info:
 
 ```zsh
 export DB_HOST=localhost
 export DB_USER=root
 export DB_PASSWORD=your_mysql_password
-export DB_NAME=azam_prokom_local
+export DB_NAME=my_logbook
 ```
 
-Alternatively, copy the included `.env.example` to `.env` and edit it:
+Option B — copy `.env.example` to `.env` and edit (recommended for beginners who prefer a file)
 
 ```zsh
 cp .env.example .env
-# edit .env with your values
+# open .env in a text editor and change DB_PASSWORD and DB_NAME
 ```
 
-Note: The app will attempt to load `.env` if `python-dotenv` is installed. Installing `python-dotenv` is optional — you can also set variables in your shell.
-
-To install python-dotenv (optional):
+Note: the app will try to load `.env` automatically if you install `python-dotenv` (optional). To install it:
 
 ```zsh
 pip install python-dotenv
 ```
 
-7) Run the app
+Either option works. If you use Option A, the variables last only for that terminal session. If you want them every time you open a terminal, add the export lines to `~/.zshrc`.
 
-With your virtualenv activated and the DB/import done, run:
+## Step 4 — start the app
+
+In the same terminal (with the virtualenv active and environment variables set), run:
 
 ```zsh
-# tell Flask which file contains the app
 export FLASK_APP=init.py
-# optional: enable development mode (shows debug output)
-export FLASK_ENV=development
-
+export FLASK_ENV=development    # optional: shows helpful debug info
 flask run
 ```
 
-Open a browser and go to http://127.0.0.1:5000/ to see the app.
+Open your web browser and go to: http://127.0.0.1:5000/
 
-If the `flask` command is not available inside the virtualenv, run:
+If `flask` is not found, run:
 
 ```zsh
 python -m flask run
 ```
 
-## What the app does (simple)
+## Very short troubleshooting
 
-- The main page lists rows from the `log_book` table.
-- Use the Add page to insert a new record (name, activity, duration, date).
-- Each row can be edited or deleted from the UI.
-- There's a search box that filters by user name or activity.
+- "Can't connect to MySQL": verify `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` are correct and MySQL server is running.
+- `ModuleNotFoundError`: make sure virtualenv is active and you ran `pip install -r requirements.txt`.
+- Permission denied when importing SQL: use a user with CREATE privileges or ask your DBA.
 
-## Troubleshooting (common beginner issues)
+## Extra (optional safety)
 
-- "Can't connect to MySQL": Check MySQL is running and that `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` are set correctly.
-- `ModuleNotFoundError` for a package: activate your virtualenv and run `pip install -r requirements.txt`.
-- Permission errors when importing SQL: ensure the MySQL user has CREATE and INSERT privileges or run import as a privileged user.
+- Do not commit real passwords to git. Keep `.env` out of version control.
+- For production you should use a secure way to store secrets (not a plain `.env`).
 - If `flask` command not found: make sure your virtualenv is activated, or run `python -m flask run` instead.
 
 ## Notes & security
@@ -163,9 +124,3 @@ python -m flask run
 
 - Add a `.env` and update the project to read other configuration (e.g., SECRET_KEY) from environment variables.
 - Add authentication to protect the UI.
-
-If you'd like, I can update `init.py` to read the Flask secret key from an environment variable and add a `.env.example` file (I will add one by default here).
-
----
-
-Follow the steps above and you should be able to run the app locally. If something fails, copy the error and paste it here and I'll help you fix it.
