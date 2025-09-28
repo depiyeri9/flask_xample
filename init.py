@@ -41,7 +41,7 @@ def index():
 
     rows = cursor.fetchall()
     conn.close()
-    return render_template("read.html", rows=rows, search_query=search_query)
+    return render_template("index.html", rows=rows, search_query=search_query)
 
 
 @app.route("/add", methods=["GET", "POST"])
